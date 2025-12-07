@@ -11,6 +11,9 @@
 #define INS_PENALTY 200.0
 #define DEL_PENALTY 200.0
 
+// --- Configuration for Silence Trimming ---
+#define ENERGY_THRESHOLD -650.0
+
 typedef struct {
     int frames;
     int coeffs;
@@ -22,40 +25,89 @@ MFCC* load_mfcc(const char *filename, const char *name, int downsample) {
     FILE *f = fopen(filename, "r");
     if (!f) return NULL;
 
-    int frames, coeffs;
-    if (fscanf(f, "%d %d", &frames, &coeffs) != 2) {
-        fclose(f); return NULL;
+    int total_frames, coeffs;
+    if (fscanf(f, "%d %d", &total_frames, &coeffs) != 2) { 
+        fclose(f); 
+        return NULL; 
     }
 
-    MFCC *mfcc = (MFCC*)malloc(sizeof(MFCC));
-    mfcc->coeffs = coeffs;
-    
-    if (downsample) {
-        mfcc->frames = (frames + 1) / 2;
-    } else {
-        mfcc->frames = frames;
+    // Temporary buffer to hold all frames
+    double **temp_data = (double**)malloc(total_frames * sizeof(double*));
+    for (int i = 0; i < total_frames; i++) {
+        temp_data[i] = (double*)malloc(coeffs * sizeof(double));
     }
 
-    mfcc->data = (double**)malloc(mfcc->frames * sizeof(double*));
-    
-    for (int i = 0; i < frames; i++) {
-        double *temp_data = (double*)malloc(coeffs * sizeof(double));
+    // 1. Read all frames
+    for (int i = 0; i < total_frames; i++) {
         for (int j = 0; j < coeffs; j++) {
-            fscanf(f, "%lf", &temp_data[j]);
+            fscanf(f, "%lf", &temp_data[i][j]);
         }
-        
+    }
+    fclose(f);
+
+    // 2. Identify Start/End of Speech (Simple Energy Thresholding)
+    int start_idx = 0;
+    int end_idx = total_frames - 1;
+
+    // Find start (first frame > threshold)
+    while (start_idx < total_frames && temp_data[start_idx][0] < ENERGY_THRESHOLD) {
+        start_idx++;
+    }
+
+    // Find end (last frame > threshold)
+    while (end_idx >= 0 && temp_data[end_idx][0] < ENERGY_THRESHOLD) {
+        end_idx--;
+    }
+
+    // Handle case where file is effectively empty/silent
+    if (start_idx > end_idx) {
+        // Fallback: Keep everything if threshold fails
+        start_idx = 0;
+        end_idx = total_frames - 1;
+    }
+
+    int valid_frames = end_idx - start_idx + 1;
+
+    // Apply downsampling if needed
+    int final_frames;
+    if (downsample) {
+        final_frames = (valid_frames + 1) / 2;
+    } else {
+        final_frames = valid_frames;
+    }
+
+    // 3. Create Final MFCC Struct
+    MFCC *mfcc = (MFCC*)malloc(sizeof(MFCC));
+    mfcc->frames = final_frames;
+    mfcc->coeffs = coeffs;
+    mfcc->data = (double**)malloc(final_frames * sizeof(double*));
+
+    int dest_idx = 0;
+    for (int i = 0; i < valid_frames; i++) {
         if (downsample) {
-            if (i % 2 == 0) { 
-                mfcc->data[i/2] = temp_data;
-            } else {
-                free(temp_data);
+            if (i % 2 == 0) {
+                mfcc->data[dest_idx] = (double*)malloc(coeffs * sizeof(double));
+                for (int j = 0; j < coeffs; j++) {
+                    mfcc->data[dest_idx][j] = temp_data[start_idx + i][j];
+                }
+                dest_idx++;
             }
         } else {
-            mfcc->data[i] = temp_data;
+            mfcc->data[i] = (double*)malloc(coeffs * sizeof(double));
+            for (int j = 0; j < coeffs; j++) {
+                mfcc->data[i][j] = temp_data[start_idx + i][j];
+            }
         }
     }
+
     if (name) strcpy(mfcc->name, name);
-    fclose(f);
+
+    // Cleanup temp
+    for (int i = 0; i < total_frames; i++) {
+        free(temp_data[i]);
+    }
+    free(temp_data);
+
     return mfcc;
 }
 
