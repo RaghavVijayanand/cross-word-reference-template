@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code - SpeechRecog</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">SpeechRecog</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="concepts.html">Concepts</a>
+                <a href="code.html" style="color: var(--primary-color);">Code</a>
+                <a href="output.html">Output</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Code Walkthrough</h1>
+
+        <section class="card">
+            <h2>1. Data Preparation</h2>
+            <h3>prepare_data.py & prepare_connected_data.py</h3>
+            <p>These Python scripts use <code>librosa</code> to load audio files and extract MFCC features.</p>
+            <pre><code>def get_mfcc(file_path):
+    y, sr = librosa.load(file_path, sr=None)
+    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+    return mfcc.T # Transpose to (frames, coeffs)</code></pre>
+            <p>The features are saved as text files (later renamed to <code>.mfcc</code>) for easy consumption by the C
+                programs.</p>
+        </section>
+
+        <section class="card">
+            <h2>2. Template Generation</h2>
+            <h3>find_templates.c</h3>
+            <p>This C program loads all training samples for a digit and computes the pairwise DTW distances.</p>
+            <p>It selects the sample with the minimum total distance to all others as the <strong>Reference
+                    Template</strong>.</p>
+            <pre><code>// Pseudocode for Medoid Selection
+min_total_dist = INF
+best_idx = -1
+for i in samples:
+    total_dist = 0
+    for j in samples:
+        total_dist += dtw(i, j)
+    if total_dist < min_total_dist:
+        min_total_dist = total_dist
+        best_idx = i</code></pre>
+        </section>
+
+        <section class="card">
+            <h2>3. Continuous Digit Recognition</h2>
+            <h3>level_building.c</h3>
+            <p>This is the core engine. It implements the Level Building algorithm with <strong>Time Warping
+                    Penalties</strong>.</p>
+            <p>To handle the speed difference between isolated templates and connected speech, we:</p>
+            <ul>
+                <li><strong>Downsample Templates</strong>: Reduce template length by 2x to match faster connected
+                    speech.</li>
+                <li><strong>Asymmetric Penalties</strong>:
+                    <ul>
+                        <li><code>INS_PENALTY (200.0)</code>: Penalizes stretching a template (preventing "1" -> "111").
+                        </li>
+                        <li><code>DEL_PENALTY (200.0)</code>: Penalizes compressing a template (preventing "111" ->
+                            "1").</li>
+                    </ul>
+                </li>
+            </ul>
+            <pre><code>// DP with Penalties
+double v1 = local_d[r][t-1] + INS_PENALTY; // Insertion
+double v2 = local_d[r-1][t-1];             // Match
+double v3 = local_d[r-1][t] + DEL_PENALTY; // Deletion</code></pre>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Connected Digits Recognition Project</p>
+    </footer>
+</body>
+
+</html>

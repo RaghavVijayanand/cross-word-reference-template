@@ -1,0 +1,10 @@
+1_0.mfcc 1
+1_1.mfcc 1
+4_2.mfcc 4
+4_3.mfcc 4
+5_4.mfcc 5
+5_5.mfcc 5
+7_6.mfcc 7
+7_7.mfcc 7
+o_8.mfcc o
+o_9.mfcc o

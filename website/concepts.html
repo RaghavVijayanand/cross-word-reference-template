@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concepts - SpeechRecog</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">SpeechRecog</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="concepts.html" style="color: var(--primary-color);">Concepts</a>
+                <a href="code.html">Code</a>
+                <a href="output.html">Output</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Theoretical Concepts</h1>
+
+        <section class="card">
+            <h2>1. MFCC (Mel-Frequency Cepstral Coefficients)</h2>
+            <p>
+                MFCCs are the most widely used features in speech recognition. They represent the short-term power
+                spectrum of a sound, based on a linear cosine transform of a log power spectrum on a nonlinear mel scale
+                of frequency.
+            </p>
+            <p><strong>Why use them?</strong> They approximate the human auditory system's response more closely than
+                linearly-spaced frequency bands.</p>
+            <p>In this project, we extract <strong>13 coefficients</strong> for each time frame.</p>
+        </section>
+
+        <section class="card">
+            <h2>2. DTW (Dynamic Time Warping)</h2>
+            <p>
+                DTW is an algorithm for measuring similarity between two temporal sequences, which may vary in speed.
+            </p>
+            <p>
+                For example, similarities in walking patterns could be detected using DTW, even if one person was
+                walking faster than the other, or if there were accelerations and decelerations during the course of an
+                observation.
+            </p>
+            <p>
+                We use DTW to calculate the distance between a test utterance and our reference templates.
+            </p>
+        </section>
+
+        <section class="card">
+            <h2>3. Medoid Selection for Templates</h2>
+            <p>
+                To represent each digit (0-9), we need a "reference template". Instead of averaging (which blurs
+                temporal features), we select the <strong>Medoid</strong>.
+            </p>
+            <p>
+                The medoid is the sample in the training set whose average DTW distance to all other samples in the set
+                is minimized. It is the most "central" or "representative" actual sample.
+            </p>
+        </section>
+
+        <section class="card">
+            <h2>4. Level Building for Continuous Recognition</h2>
+            <p>
+                Recognizing <strong>Continuous Digits</strong> (e.g., "123" spoken without pauses) is challenging
+                because the boundaries between digits are unknown.
+            </p>
+            <p>
+                <strong>Level Building</strong> is a 2-level Dynamic Programming algorithm designed for this purpose:
+            </p>
+            <ul>
+                <li><strong>Level 1 (Digit Matching)</strong>: Matches each digit template against segments of the test
+                    signal.</li>
+                <li><strong>Level 2 (Sequence Matching)</strong>: Finds the optimal sequence of digits that minimizes
+                    the total accumulated distance over the entire continuous utterance.</li>
+            </ul>
+            <p>
+                This allows the system to recognize a stream of digits without requiring prior segmentation.
+            </p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Connected Digits Recognition Project</p>
+    </footer>
+</body>
+
+</html>

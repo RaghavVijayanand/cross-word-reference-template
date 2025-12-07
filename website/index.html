@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connected Digits Recognition</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">SpeechRecog</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="concepts.html">Concepts</a>
+                <a href="code.html">Code</a>
+                <a href="output.html">Output</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Continuous Digit Recognition</h1>
+            <p style="font-size: 1.2rem; color: #64748b; max-width: 600px; margin: 0 auto;">
+                A project implementing Level Building algorithm for recognizing continuous digits using MFCC features
+                and Dynamic Time Warping.
+            </p>
+            <div style="margin-top: 2rem;">
+                <a href="concepts.html" class="btn">Learn Concepts</a>
+                <a href="output.html" class="btn"
+                    style="background-color: white; color: var(--primary-color); border: 1px solid var(--primary-color); margin-left: 1rem;">View
+                    Results</a>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Project Overview</h2>
+            <p>
+                This project demonstrates a complete pipeline for speech recognition of continuous digits (e.g.,
+                "1-2-3").
+                It moves from processing raw audio files to extracting features, building reference templates, and
+                finally recognizing sequences using advanced dynamic programming techniques.
+            </p>
+            <h3>Key Features</h3>
+            <ul>
+                <li><strong>MFCC Extraction</strong>: Converting audio waveforms into Mel-frequency cepstral
+                    coefficients.</li>
+                <li><strong>Template Generation</strong>: Finding the "medoid" of training samples using DTW.</li>
+                <li><strong>Level Building</strong>: A 2-level Dynamic Programming algorithm to recognize sequences of
+                    digits without segmentation.</li>
+                <li><strong>Hybrid Implementation</strong>: Python for data processing and C for high-performance core
+                    algorithms.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Connected Digits Recognition Project</p>
+    </footer>
+</body>
+
+</html>
