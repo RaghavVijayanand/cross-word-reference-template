@@ -3,8 +3,8 @@ echo ==========================================
 echo      Speech Recognition Pipeline
 echo ==========================================
 
-echo [1/5] Extracting Digit Templates...
-python extract_all_templates.py
+echo [1/5] Extracting Single Best Templates (Medoids)...
+python tune_templates.py
 
 echo [2/5] Extracting Silence Template...
 python extract_silence.py

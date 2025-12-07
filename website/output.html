@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output - SpeechRecog</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">SpeechRecog</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="concepts.html">Concepts</a>
+                <a href="code.html">Code</a>
+                <a href="output.html" style="color: var(--primary-color);">Output</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Results & Analysis</h1>
+
+        <section class="card">
+            <h2>Continuous Recognition Results (Team-1)</h2>
+            <p>We tested the system with <strong>Single Template per Digit + Silence</strong>. Below is a sample of the
+                output:</p>
+            <pre><code>Filename        GroundTruth     Recognized
+----------------------------------------
+111a.mfcc       111             74
+455a.mfcc       455             455
+55a.mfcc        55              55
+711a.mfcc       711             711
+74a.mfcc        74              74
+77a.mfcc        77              _77
+...</code></pre>
+            <p>
+                <strong>Observation:</strong> We restricted the system to use <strong>Only One Template per
+                    Digit</strong> (the Medoid) plus a Silence template.
+                The system correctly recognizes "455", "55", "711", "74", and "77".
+                However, recognition of "111" degraded compared to the multi-template approach, suggesting that a single
+                template for '1' struggles to capture the variance in connected speech.
+            </p>
+            <p>
+                <strong>Final Configuration:</strong><br>
+                1. <strong>Templates:</strong> Single Medoid per digit + Silence.<br>
+                2. <strong>Constraints:</strong> Min 7 frames, Max 2x template length.<br>
+                3. <strong>Penalties:</strong> 200.0.
+            </p>
+            <p>
+                <strong>Conclusion:</strong> The system works well for distinct digits (4, 5, 7) even with a single
+                template, but '1' requires more variation or better template selection.
+            </p>
+        </section>
+
+        <section class="card">
+            <h2>Visualization: Level Building Heatmap</h2>
+            <p>
+                The heatmap below visualizes the accumulated distance matrix <code>D[l][t]</code>.
+            </p>
+            <p>
+                <strong>X-axis</strong>: Time frames of the test signal.<br>
+                <strong>Y-axis</strong>: Level (number of digits recognized so far).<br>
+                <strong>Color</strong>: Accumulated distance (Darker is lower cost/better match).
+            </p>
+            <div style="text-align: center; margin: 2rem 0;">
+                <img src="assets/level_building_heatmap.png" alt="Level Building Heatmap">
+            </div>
+            <p>
+                You can see the path traversing multiple levels, indicating that the algorithm prefers a sequence of
+                digits over a single stretched digit.
+            </p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Connected Digits Recognition Project</p>
+    </footer>
+</body>
+
+</html>
